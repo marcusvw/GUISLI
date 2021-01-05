@@ -29,7 +29,7 @@ private:
     M5EPD_Canvas canvas = (&M5.EPD);
 #endif
 #ifdef HW_M5CORE2
-    M5Display canvas = (&M5.lcd);
+    #define canvas  M5.Lcd
 #endif
     JsonRPC rpc;
     FS *fsHandler;

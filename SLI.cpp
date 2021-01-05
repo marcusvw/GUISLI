@@ -33,7 +33,9 @@ SliderPage::SliderPage(JsonObject obj, PAG_pos_t cp, bool useSDCard)
      **/
     GUI_CheckImage(image1);
     GUI_CheckImage(image2);
+#ifdef HW_M5PAPER
     canvas.createCanvas(320, 240);
+#endif
 }
 
 /**
@@ -42,10 +44,16 @@ SliderPage::SliderPage(JsonObject obj, PAG_pos_t cp, bool useSDCard)
 void SliderPage::activate()
 {
     active = true;
+#ifdef HW_M5PAPER
     canvas.fillCanvas(BLACK);
+#endif
+#ifdef HW_M5CORE2
+    canvas.fillScreen(BLACK);
+#endif
+
     Serial.printf("SLI INF Drawing Side and imgs\r\n");
-    canvas.drawFastVLine(SLIDER_X, SLIDER_Y, SLIDER_HEIGHT, WHITE);
-    canvas.drawFastVLine(SLIDER_X + SLIDER_WIDTH, SLIDER_Y, SLIDER_HEIGHT, WHITE);
+    canvas.drawFastVLine(SLIDER_X, SLIDER_Y, SLIDER_HEIGHT, PAG_FOREGND);
+    canvas.drawFastVLine(SLIDER_X + SLIDER_WIDTH, SLIDER_Y, SLIDER_HEIGHT, PAG_FOREGND);
     canvas.drawBmpFile(*fsHandler, image1.c_str(), IMG_POS1_X, IMG_POS1_Y);
     canvas.drawBmpFile(*fsHandler, image2.c_str(), IMG_POS2_X, IMG_POS2_Y);
     Serial.printf("SLI INF Update Slider n\r\n");
@@ -54,8 +62,9 @@ void SliderPage::activate()
     pos.x = -1;
     handleInput(pos);
     renderHeader(header.c_str());
-    canvas.drawRect(0, 0, PAGE_WIDTH, PAGE_HEIGHT, 15);
+    
 #ifdef HW_M5PAPER
+    canvas.drawRect(0, 0, PAGE_WIDTH, PAGE_HEIGHT, PAG_FOREGND);
     canvas.pushCanvas(canvas_pos.x, canvas_pos.y, UPDATE_MODE_GC16);
 #endif
 
@@ -68,7 +77,7 @@ void SliderPage::activate()
 void SliderPage::renderHeader(const char *string)
 {
     canvas.setTextSize(1);
-    canvas.fillRect(3, 4, 316, 20, 15);
+    canvas.fillRect(3, 4, 316, 20, PAG_FOREGND);
     canvas.setTextColor(0);
     canvas.setTextDatum(TC_DATUM);
     canvas.drawString(string, 160, 3, 4);
@@ -106,16 +115,16 @@ void SliderPage::draw()
             color = WHITE;
         }
         color = ((state / 6) << 11) | ((state / 3) << 5 | (state / 6));
-        canvas.drawFastHLine(SLIDER_X + 5, (SLIDER_Y + 200) - (z * 2), (SLIDER_WIDTH - 10), 15);
-        canvas.drawFastHLine(SLIDER_X + 5, (SLIDER_Y + 200) - (z * 2 + 1), (SLIDER_WIDTH - 10), 15);
+        canvas.drawFastHLine(SLIDER_X + 5, (SLIDER_Y + 200) - (z * 2), (SLIDER_WIDTH - 10), PAG_FOREGND);
+        canvas.drawFastHLine(SLIDER_X + 5, (SLIDER_Y + 200) - (z * 2 + 1), (SLIDER_WIDTH - 10), PAG_FOREGND);
     }
     /**
      * Fill the rest black
      **/
     for (z = state; z < 100; z++)
     {
-        canvas.drawFastHLine(SLIDER_X + 5, (SLIDER_Y + 200) - (z * 2), (SLIDER_WIDTH - 10), BLACK);
-        canvas.drawFastHLine(SLIDER_X + 5, (SLIDER_Y + 200) - (z * 2 + 1), (SLIDER_WIDTH - 10), BLACK);
+        canvas.drawFastHLine(SLIDER_X + 5, (SLIDER_Y + 200) - (z * 2), (SLIDER_WIDTH - 10), PAG_BACKGND);
+        canvas.drawFastHLine(SLIDER_X + 5, (SLIDER_Y + 200) - (z * 2 + 1), (SLIDER_WIDTH - 10), PAG_BACKGND);
     }
 #ifdef HW_M5PAPER
     canvas.pushCanvas(canvas_pos.x, canvas_pos.y, UPDATE_MODE_DU4);
