@@ -205,7 +205,7 @@ void SliderPage::handleInput(PAG_pos_t posT)
                 if ((millis() - lastUpdate) > 500)
                 {
                     lastUpdate = millis();
-                    uint32_t uVal = JsonRPC::execute_int("GetValue", String(itemId));
+                    int32_t uVal = JsonRPC::execute_int("GetValue", String(itemId));
                     if (JsonRPC::checkStatus())
                     {
                         int32_t sVal = (int32_t)(((float)(uVal)) / factor);
