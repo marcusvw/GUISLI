@@ -57,18 +57,23 @@ void SliderPage::activate()
     canvas.drawBmpFile(*fsHandler, image1.c_str(), IMG_POS1_X, IMG_POS1_Y);
     canvas.drawBmpFile(*fsHandler, image2.c_str(), IMG_POS2_X, IMG_POS2_Y);
     Serial.printf("SLI INF Update Slider n\r\n");
+    renderHeader(header.c_str());
     PAG_pos_t pos;
     pos.y = -1;
     pos.x = -1;
-    handleInput(pos);
-    renderHeader(header.c_str());
-    
-#ifdef HW_M5PAPER
+    //handleInput(pos);
+    #ifdef HW_M5PAPER
     canvas.drawRect(0, 0, PAGE_WIDTH, PAGE_HEIGHT, PAG_FOREGND);
-    canvas.pushCanvas(canvas_pos.x, canvas_pos.y, UPDATE_MODE_GC16);
+    if (GUI_cachedUpdate())
+    {
+        canvas.pushCanvas(canvas_pos.x, canvas_pos.y, UPDATE_MODE_NONE);
+    }
+    else
+    {
+        canvas.pushCanvas(canvas_pos.x, canvas_pos.y, UPDATE_MODE_GC16);
+    }
 #endif
 
-    draw();
 }
 
 /**
@@ -127,7 +132,14 @@ void SliderPage::draw()
         canvas.drawFastHLine(SLIDER_X + 5, (SLIDER_Y + 200) - (z * 2 + 1), (SLIDER_WIDTH - 10), PAG_BACKGND);
     }
 #ifdef HW_M5PAPER
-    canvas.pushCanvas(canvas_pos.x, canvas_pos.y, UPDATE_MODE_DU4);
+if (GUI_cachedUpdate())
+    {
+        //canvas.pushCanvas(canvas_pos.x, canvas_pos.y, UPDATE_MODE_NONE);
+    }
+    else
+    {
+        canvas.pushCanvas(canvas_pos.x, canvas_pos.y, UPDATE_MODE_DU4);
+    }
 #endif
 
     Serial.printf("SLI INF  Draw Slider \r\n");
@@ -202,7 +214,7 @@ void SliderPage::handleInput(PAG_pos_t posT)
             }
             else /** No slider activity, if update time passed gte value from server**/
             {
-                if ((millis() - lastUpdate) > 500)
+                if ((millis() - lastUpdate) > 1100)
                 {
                     lastUpdate = millis();
                     int32_t uVal = JsonRPC::execute_int("GetValue", String(itemId));
